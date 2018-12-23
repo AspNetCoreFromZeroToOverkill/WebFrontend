@@ -2,8 +2,7 @@ import { ActionTree } from 'vuex';
 import { GroupsState, Group } from './state';
 import { RootState } from '@/store/state';
 import { mutationTypes } from './mutations';
-
-let currentId: number = 2;
+import { GroupsEndpoint } from '@/data/groups/groups-endpoint';
 
 export const actionTypes = {
     LOAD_GROUPS: 'loadGroups',
@@ -12,23 +11,23 @@ export const actionTypes = {
     REMOVE_GROUP: 'removeGroup',
 };
 
-export const actions: ActionTree<GroupsState, RootState> = {
-    loadGroups({ commit }): void {
-        // TODO: invoke api to fetch the groups
-        const groups: Group[] = [
-            { id: 1, name: 'Sample Group', rowVersion: 'aaa' },
-            { id: 2, name: 'Another Sample Group', rowVersion: 'bbb' }
-        ];
-        commit(mutationTypes.SET_GROUPS, groups);
-    },
-    addGroup({ commit }, group: Group): void {
-        group.id = ++currentId;
-        commit(mutationTypes.ADD_GROUP, group);
-    },
-    updateGroup({ commit }, group: Group): void {
-        commit(mutationTypes.UPDATE_GROUP, group);
-    },
-    removeGroup({commit}, groupId: number): void {
-        commit(mutationTypes.REMOVE_GROUP, groupId);
-    }
+export const makeActions = (groupsService: GroupsEndpoint): ActionTree<GroupsState, RootState> => {
+    return {
+        async loadGroups({ commit }): Promise<void> {
+            const groups: Group[] = await groupsService.GetAll();
+            commit(mutationTypes.SET_GROUPS, groups);
+        },
+        async addGroup({ commit }, group: Group): Promise<void> {
+            const addedGroup: Group = await groupsService.Add(group);
+            commit(mutationTypes.ADD_GROUP, addedGroup);
+        },
+        async updateGroup({ commit }, group: Group): Promise<void> {
+            const updatedGroup: Group = await groupsService.Update(group);
+            commit(mutationTypes.UPDATE_GROUP, updatedGroup);
+        },
+        async removeGroup({commit}, groupId: number): Promise<void> {
+            await groupsService.Remove(groupId);
+            commit(mutationTypes.REMOVE_GROUP, groupId);
+        }
+    };
 };
