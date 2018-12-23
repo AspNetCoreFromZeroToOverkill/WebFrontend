@@ -3,8 +3,12 @@
 </template>
 <script lang="ts">
 import { Component, Vue } from 'vue-property-decorator';
+import { Getter, Action } from 'vuex-class';
 import GroupList from '@/components/groups/GroupList.vue';
 import { GroupViewModel } from '@/components/groups/models';
+import { actionTypes } from '@/store/modules/groups/actions';
+
+const namespace: string = 'groups';
 
 @Component({
   components: {
@@ -12,24 +16,15 @@ import { GroupViewModel } from '@/components/groups/models';
   }
 })
 export default class Groups extends Vue {
-  private currentId: number = 0;
-  private groups: GroupViewModel[] = [
-    { id: ++this.currentId, name: 'Sample Group', rowVersion: 'aaa' },
-    { id: ++this.currentId, name: 'Another Sample Group', rowVersion: 'bbb' }
-  ];
+  @Getter('groups', { namespace }) private groups!: GroupViewModel[];
+  @Action(actionTypes.LOAD_GROUPS, { namespace }) private loadGroups!: () => void;
+  @Action(actionTypes.ADD_GROUP, { namespace }) private onAdd!: (group: GroupViewModel) => void; //duck typing FTW! - GroupViewModel has the same format as Group
+  @Action(actionTypes.UPDATE_GROUP, { namespace }) private onUpdate!: (group: GroupViewModel) => void;
+  @Action(actionTypes.REMOVE_GROUP, { namespace }) private onRemove!: (groupdId: number) => void;
 
-  private onUpdate(group: GroupViewModel): void {
-    const index = this.groups.findIndex(g => g.id === group.id);
-    this.groups = [...this.groups.slice(0, index), group, ...this.groups.slice(index + 1, this.groups.length)];
-  }
-
-  private onRemove(groupId: number): void {
-    this.groups = this.groups.filter(g => g.id !== groupId);
-  }
-
-  private onAdd(group: GroupViewModel): void {
-    group.id = ++this.currentId;
-    this.groups = [...this.groups, group];
+  public mounted() {
+    //fetch data as soon as component is mounted
+    this.loadGroups();
   }
 }
 </script>
