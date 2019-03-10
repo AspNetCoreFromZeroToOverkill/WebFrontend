@@ -24,11 +24,11 @@ export class GroupsService extends BaseService implements GroupsEndpoint {
     }
 
     public async update(group: GroupModel): Promise<GroupModel> {
-        const response = await axios.put(`${this.baseUrl}/${group.id}`, group);
+        const response = await axios.put(`${this.baseUrl}/${group.id}`, group, this.getAxiosConfig());
         return response.data;
     }
 
     public async remove(id: number): Promise<void> {
-        const response = await axios.delete(`${this.baseUrl}/${id}`);
+        const response = await axios.delete(`${this.baseUrl}/${id}`, this.getAxiosConfig());
     }
 }
