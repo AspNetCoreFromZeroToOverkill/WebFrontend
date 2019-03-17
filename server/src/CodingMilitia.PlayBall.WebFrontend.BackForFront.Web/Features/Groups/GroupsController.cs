@@ -24,8 +24,8 @@ namespace CodingMilitia.PlayBall.WebFrontend.BackForFront.Web.Features.Groups
         {
             // TODO: handle possible _httpClient errors
             var response = await _httpClient.GetAsync(BaseAddress, ct);
-            var result = await response.Content.ReadAsAsync<IReadOnlyCollection<GroupModel>>(ct);
-            return Ok(result);
+            var result = await response.Content.ReadAsAsync<GroupModel[]>(ct);
+            return result;
         }
 
         [HttpGet]
