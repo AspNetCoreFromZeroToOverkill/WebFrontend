@@ -40,7 +40,7 @@ namespace CodingMilitia.PlayBall.WebFrontend.BackForFront.Web.AuthTokenHelpers
                 return TokenRefreshResult.Failed();
             }
 
-            if (!DateTime.TryParse(expiresAt, out var expiresAtDate) || expiresAtDate >= GetRefreshThreshold())
+            if (!DateTime.TryParse(expiresAt, CultureInfo.InvariantCulture, DateTimeStyles.AdjustToUniversal, out var expiresAtDate) || expiresAtDate >= GetRefreshThreshold())
             {
                 return TokenRefreshResult.NoRefreshNeeded();
             }
