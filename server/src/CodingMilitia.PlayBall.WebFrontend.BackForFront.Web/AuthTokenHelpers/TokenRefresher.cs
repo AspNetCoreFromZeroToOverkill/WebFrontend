@@ -39,7 +39,7 @@ namespace CodingMilitia.PlayBall.WebFrontend.BackForFront.Web.AuthTokenHelpers
             {
                 return TokenRefreshResult.Failed();
             }
-            
+
             if (!DateTime.TryParse(expiresAt, out var expiresAtDate) || expiresAtDate >= GetRefreshThreshold())
             {
                 return TokenRefreshResult.NoRefreshNeeded();
