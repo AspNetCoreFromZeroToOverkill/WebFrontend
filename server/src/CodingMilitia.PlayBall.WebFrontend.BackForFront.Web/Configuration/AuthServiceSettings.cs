@@ -5,6 +5,7 @@ namespace CodingMilitia.PlayBall.WebFrontend.BackForFront.Web.Configuration
     {
         public string Authority { get; set; }
         public bool RequireHttpsMetadata { get; set; }
+        public string ClientId { get; set; }
         public string ClientSecret { get; set; }
     }
 }

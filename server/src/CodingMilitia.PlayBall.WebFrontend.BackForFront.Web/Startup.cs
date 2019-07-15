@@ -46,10 +46,15 @@ namespace CodingMilitia.PlayBall.WebFrontend.BackForFront.Web
                 .AddControllersAsServices();
 
 
-            services.AddSingleton<IDiscoveryCache>(serviceProvider =>
+            services.AddSingleton(serviceProvider => 
             {
                 var configuration = serviceProvider.GetRequiredService<IConfiguration>();
-                var authServiceConfig = configuration.GetSection<AuthServiceSettings>("AuthServiceSettings");
+                return configuration.GetSection<AuthServiceSettings>("AuthServiceSettings");
+            });
+
+            services.AddSingleton<IDiscoveryCache>(serviceProvider =>
+            {
+                var authServiceConfig = serviceProvider.GetRequiredService<AuthServiceSettings>();
                 var factory = serviceProvider.GetRequiredService<IHttpClientFactory>();
                 return new DiscoveryCache(authServiceConfig.Authority, () => factory.CreateClient());
             });
@@ -94,7 +99,7 @@ namespace CodingMilitia.PlayBall.WebFrontend.BackForFront.Web
                     options.Authority = authServiceConfig.Authority;
                     options.RequireHttpsMetadata = authServiceConfig.RequireHttpsMetadata;
 
-                    options.ClientId = "WebFrontend";
+                    options.ClientId = authServiceConfig.ClientId;
                     options.ClientSecret = authServiceConfig.ClientSecret;
                     options.ResponseType = OidcConstants.ResponseTypes.Code;
 
