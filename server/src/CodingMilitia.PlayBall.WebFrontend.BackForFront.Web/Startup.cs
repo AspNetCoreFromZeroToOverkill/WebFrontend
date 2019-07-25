@@ -15,6 +15,8 @@ using System;
 using System.IdentityModel.Tokens.Jwt;
 using System.Net.Http;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Http.Extensions;
+using Microsoft.AspNetCore.Mvc.ApplicationModels;
 
 [assembly: ApiController]
 
@@ -41,6 +43,7 @@ namespace CodingMilitia.PlayBall.WebFrontend.BackForFront.Web
                         .Build();
                     options.Filters.Add(new AuthorizeFilter(policy));
                     options.Filters.Add(new AutoValidateAntiforgeryTokenAttribute());
+                    
                 })
                 .SetCompatibilityVersion(CompatibilityVersion.Version_2_2)
                 .AddControllersAsServices();
@@ -98,7 +101,7 @@ namespace CodingMilitia.PlayBall.WebFrontend.BackForFront.Web
 
                     options.Authority = authServiceConfig.Authority;
                     options.RequireHttpsMetadata = authServiceConfig.RequireHttpsMetadata;
-
+                    
                     options.ClientId = authServiceConfig.ClientId;
                     options.ClientSecret = authServiceConfig.ClientSecret;
                     options.ResponseType = OidcConstants.ResponseTypes.Code;
@@ -109,13 +112,17 @@ namespace CodingMilitia.PlayBall.WebFrontend.BackForFront.Web
                     options.Scope.Add("GroupManagement");
                     options.Scope.Add(OidcConstants.StandardScopes.OfflineAccess);
 
+                    options.CallbackPath = "/api/signin-oidc";
+                    //options.Configuration.AuthorizationEndpoint = "http://auth.playball.localhost/connect/authorize";
+                    
                     options.Events.OnRedirectToIdentityProvider = context =>
                     {
-                        if (!context.HttpContext.Request.Path.StartsWithSegments("/auth/login"))
+                        if (!context.HttpContext.Request.Path.StartsWithSegments("/api/auth/login"))
                         {
                             context.HttpContext.Response.StatusCode = 401;
                             context.HandleResponse();
                         }
+                        
                         return Task.CompletedTask;
                     };
                 });

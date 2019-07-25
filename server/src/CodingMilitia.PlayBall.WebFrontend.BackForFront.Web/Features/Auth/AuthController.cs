@@ -4,7 +4,7 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace CodingMilitia.PlayBall.WebFrontend.BackForFront.Web.Features.Auth
 {
-    [Route("auth")]
+    [Route("api/auth")]
     public class AuthController : ControllerBase
     {
         private readonly IAntiforgery _antiForgery;
