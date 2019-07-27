@@ -113,7 +113,6 @@ namespace CodingMilitia.PlayBall.WebFrontend.BackForFront.Web
                     options.Scope.Add(OidcConstants.StandardScopes.OfflineAccess);
 
                     options.CallbackPath = "/api/signin-oidc";
-                    //options.Configuration.AuthorizationEndpoint = "http://auth.playball.localhost/connect/authorize";
                     
                     options.Events.OnRedirectToIdentityProvider = context =>
                     {
