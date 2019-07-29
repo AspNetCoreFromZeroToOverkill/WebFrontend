@@ -109,6 +109,8 @@ namespace CodingMilitia.PlayBall.WebFrontend.BackForFront.Web
                     options.Scope.Add("GroupManagement");
                     options.Scope.Add(OidcConstants.StandardScopes.OfflineAccess);
 
+                    options.CallbackPath = "/api/signin-oidc";
+                    
                     options.Events.OnRedirectToIdentityProvider = context =>
                     {
                         if (!context.HttpContext.Request.Path.StartsWithSegments("/auth/login"))
