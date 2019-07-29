@@ -3,6 +3,7 @@ using System.Globalization;
 using System.Net.Http;
 using System.Threading;
 using System.Threading.Tasks;
+using CodingMilitia.PlayBall.WebFrontend.BackForFront.Web.Configuration;
 using IdentityModel;
 using IdentityModel.Client;
 using Microsoft.AspNetCore.Authentication;
@@ -18,14 +19,18 @@ namespace CodingMilitia.PlayBall.WebFrontend.BackForFront.Web.AuthTokenHelpers
 
         private readonly HttpClient _httpClient;
         private readonly IDiscoveryCache _discoveryCache;
+        private readonly AuthServiceSettings _authServiceSettings;
         private readonly ILogger<TokenRefresher> _logger;
 
-        public TokenRefresher(HttpClient httpClient,
+        public TokenRefresher(
+            HttpClient httpClient,
             IDiscoveryCache discoveryCache,
+            AuthServiceSettings authServiceSettings,
             ILogger<TokenRefresher> logger)
         {
             _httpClient = httpClient;
             _discoveryCache = discoveryCache;
+            _authServiceSettings = authServiceSettings;
             _logger = logger;
         }
 
@@ -39,8 +44,8 @@ namespace CodingMilitia.PlayBall.WebFrontend.BackForFront.Web.AuthTokenHelpers
             {
                 return TokenRefreshResult.Failed();
             }
-            
-            if (!DateTime.TryParse(expiresAt, out var expiresAtDate) || expiresAtDate >= GetRefreshThreshold())
+
+            if (!DateTime.TryParse(expiresAt, CultureInfo.InvariantCulture, DateTimeStyles.AdjustToUniversal, out var expiresAtDate) || expiresAtDate >= GetRefreshThreshold())
             {
                 return TokenRefreshResult.NoRefreshNeeded();
             }
@@ -50,8 +55,8 @@ namespace CodingMilitia.PlayBall.WebFrontend.BackForFront.Web.AuthTokenHelpers
                 new RefreshTokenRequest
                 {
                     Address = discovered.TokenEndpoint,
-                    ClientId = "WebFrontend",
-                    ClientSecret = "secret",
+                    ClientId = _authServiceSettings.ClientId,
+                    ClientSecret = _authServiceSettings.ClientSecret,
                     RefreshToken = refreshToken
                 }, ct);
 
