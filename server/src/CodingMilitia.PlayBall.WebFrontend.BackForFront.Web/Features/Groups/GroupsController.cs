@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace CodingMilitia.PlayBall.WebFrontend.BackForFront.Web.Features.Groups
 {
-    [Route("groups")]
+    [Route("api/groups")]
     public class GroupsController : ControllerBase
     {
         private const string BaseAddress = "/groups";
