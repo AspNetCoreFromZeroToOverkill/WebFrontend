@@ -17,6 +17,8 @@ using System.Net.Http;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http.Extensions;
 using Microsoft.AspNetCore.Mvc.ApplicationModels;
+using Microsoft.AspNetCore.DataProtection;
+using System.IO;
 
 [assembly: ApiController]
 
@@ -43,13 +45,13 @@ namespace CodingMilitia.PlayBall.WebFrontend.BackForFront.Web
                         .Build();
                     options.Filters.Add(new AuthorizeFilter(policy));
                     options.Filters.Add(new AutoValidateAntiforgeryTokenAttribute());
-                    
+
                 })
                 .SetCompatibilityVersion(CompatibilityVersion.Version_2_2)
                 .AddControllersAsServices();
 
 
-            services.AddSingleton(serviceProvider => 
+            services.AddSingleton(serviceProvider =>
             {
                 var configuration = serviceProvider.GetRequiredService<IConfiguration>();
                 return configuration.GetSection<AuthServiceSettings>("AuthServiceSettings");
@@ -101,7 +103,7 @@ namespace CodingMilitia.PlayBall.WebFrontend.BackForFront.Web
 
                     options.Authority = authServiceConfig.Authority;
                     options.RequireHttpsMetadata = authServiceConfig.RequireHttpsMetadata;
-                    
+
                     options.ClientId = authServiceConfig.ClientId;
                     options.ClientSecret = authServiceConfig.ClientSecret;
                     options.ResponseType = OidcConstants.ResponseTypes.Code;
@@ -113,7 +115,7 @@ namespace CodingMilitia.PlayBall.WebFrontend.BackForFront.Web
                     options.Scope.Add(OidcConstants.StandardScopes.OfflineAccess);
 
                     options.CallbackPath = "/api/signin-oidc";
-                    
+
                     options.Events.OnRedirectToIdentityProvider = context =>
                     {
                         if (!context.HttpContext.Request.Path.StartsWithSegments("/api/auth/login"))
@@ -121,13 +123,22 @@ namespace CodingMilitia.PlayBall.WebFrontend.BackForFront.Web
                             context.HttpContext.Response.StatusCode = 401;
                             context.HandleResponse();
                         }
-                        
+
                         return Task.CompletedTask;
                     };
                 });
 
             services
                 .AddAntiforgery(options => options.HeaderName = "X-XSRF-TOKEN");
+
+            var dataProtectionKeysLocation = _configuration.GetSection<DataProtectionSettings>(nameof(DataProtectionSettings)).Location;
+            if (!string.IsNullOrWhiteSpace(dataProtectionKeysLocation))
+            {
+                services
+                    .AddDataProtection()
+                    .PersistKeysToFileSystem(new DirectoryInfo(dataProtectionKeysLocation));
+                    // TODO: encrypt the keys
+            }
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
