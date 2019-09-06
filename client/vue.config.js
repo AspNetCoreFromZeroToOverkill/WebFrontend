@@ -1,13 +1,11 @@
 module.exports = {
     devServer: {
       proxy: {
-        '^/api': {
+        '**': {
+          filter: (pathname, req) => pathname.match('^/api') || pathname.match('^/auth'),
           target: 'http://localhost:5000',
           ws: true,
-          changeOrigin: true,
-          pathRewrite: {
-            '^/api': ''
-          },
+          changeOrigin: true
         }
       }
     }
