@@ -121,7 +121,9 @@ namespace CodingMilitia.PlayBall.WebFrontend.BackForFront.Web
 
             services.AddProxy();
             
-            services.AddSingleton(new ProxiedApiRouteEndpointLookup(_configuration.GetSection<Dictionary<string, string>>("ApiRoutes")));
+            services.AddSingleton(
+                new ProxiedApiRouteEndpointLookup(
+                    _configuration.GetSection<Dictionary<string, string>>("ApiRoutes")));
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -147,7 +149,6 @@ namespace CodingMilitia.PlayBall.WebFrontend.BackForFront.Web
             });
 
             app.UseMiddleware<ValidateAntiForgeryTokenMiddleware>();
-
 
             app.UseMvc();
             

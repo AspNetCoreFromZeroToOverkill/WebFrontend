@@ -9,7 +9,7 @@ namespace CodingMilitia.PlayBall.WebFrontend.BackForFront.Web.ApiRouting
     {
         // The double dictionary strategy can be simplified if we're able to lookup directly with a ReadOnlySpan<char>
         // Work in progress here -> https://github.com/dotnet/corefx/issues/31942
-        
+
         private readonly Dictionary<string, string> _routeToEndpointMap;
         private readonly Dictionary<int, string[]> _routeMatcher;
 
@@ -40,10 +40,10 @@ namespace CodingMilitia.PlayBall.WebFrontend.BackForFront.Web.ApiRouting
                 var route = FindRoute(basePath, routes);
                 return !(route is null) && _routeToEndpointMap.TryGetValue(route, out endpoint);
             }
-            
+
             return false;
         }
-        
+
         private static string FindRoute(ReadOnlySpan<char> route, string[] routes)
         {
             for (var i = 0; i < routes.Length; ++i)
@@ -54,6 +54,7 @@ namespace CodingMilitia.PlayBall.WebFrontend.BackForFront.Web.ApiRouting
                     return currentRoute;
                 }
             }
+
             return null;
         }
     }
