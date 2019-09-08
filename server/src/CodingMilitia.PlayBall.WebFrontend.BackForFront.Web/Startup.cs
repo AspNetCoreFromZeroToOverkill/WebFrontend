@@ -149,6 +149,8 @@ namespace CodingMilitia.PlayBall.WebFrontend.BackForFront.Web
             app.UseMiddleware<ValidateAntiForgeryTokenMiddleware>();
 
 
+            app.UseMvc();
+            
             app.Map("/api", api =>
             {
                 api.RunProxy(async context =>
@@ -169,9 +171,6 @@ namespace CodingMilitia.PlayBall.WebFrontend.BackForFront.Web
                     return new HttpResponseMessage(HttpStatusCode.NotFound);
                 });
             });
-
-
-            app.UseMvc();
         }
     }
 }
