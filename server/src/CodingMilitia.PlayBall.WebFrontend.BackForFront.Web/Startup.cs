@@ -14,9 +14,8 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.DataProtection;
 using System.IO;
 using System.Net;
-using CodingMilitia.PlayBall.WebFrontend.BackForFront.Web.Antiforgery;
 using CodingMilitia.PlayBall.WebFrontend.BackForFront.Web.ApiRouting;
-using Microsoft.AspNetCore.Authentication;
+using CodingMilitia.PlayBall.WebFrontend.BackForFront.Web.Security;
 using ProxyKit;
 
 [assembly: ApiController]
@@ -124,6 +123,10 @@ namespace CodingMilitia.PlayBall.WebFrontend.BackForFront.Web
             services.AddSingleton(
                 new ProxiedApiRouteEndpointLookup(
                     _configuration.GetSection<Dictionary<string, string>>("ApiRoutes")));
+
+            services
+                .AddSingleton<EnforceAuthenticatedUserMiddleware>()
+                .AddSingleton<ValidateAntiForgeryTokenMiddleware>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -135,19 +138,7 @@ namespace CodingMilitia.PlayBall.WebFrontend.BackForFront.Web
             }
 
             app.UseAuthentication();
-
-
-            app.Use(async (context, next) =>
-            {
-                if (!context.User.Identity.IsAuthenticated)
-                {
-                    await context.ChallengeAsync();
-                    return;
-                }
-
-                await next();
-            });
-
+            app.UseMiddleware<EnforceAuthenticatedUserMiddleware>();
             app.UseMiddleware<ValidateAntiForgeryTokenMiddleware>();
 
             app.UseMvc();
