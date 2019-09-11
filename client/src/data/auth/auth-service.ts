@@ -6,7 +6,7 @@ import { BaseService } from '../base-service';
 // TODO: handle eventual errors
 
 export class AuthService extends BaseService implements AuthEndpoint {
-    private readonly baseUrl: string = '/api/auth';
+    private readonly baseUrl: string = '/auth';
 
     public async getAuthInfo(): Promise<AuthInfoModel | null> {
         try {

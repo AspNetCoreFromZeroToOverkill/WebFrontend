@@ -1,24 +1,22 @@
-﻿using CodingMilitia.PlayBall.WebFrontend.BackForFront.Web.AuthTokenHelpers;
+﻿using System.Collections.Generic;
+using CodingMilitia.PlayBall.WebFrontend.BackForFront.Web.AuthTokenHelpers;
 using CodingMilitia.PlayBall.WebFrontend.BackForFront.Web.Configuration;
-using CodingMilitia.PlayBall.WebFrontend.BackForFront.Web.Features.Groups;
 using IdentityModel;
 using IdentityModel.Client;
-using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.Authorization;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using Polly;
-using System;
 using System.IdentityModel.Tokens.Jwt;
 using System.Net.Http;
 using System.Threading.Tasks;
-using Microsoft.AspNetCore.Http.Extensions;
-using Microsoft.AspNetCore.Mvc.ApplicationModels;
 using Microsoft.AspNetCore.DataProtection;
 using System.IO;
+using System.Net;
+using CodingMilitia.PlayBall.WebFrontend.BackForFront.Web.ApiRouting;
+using CodingMilitia.PlayBall.WebFrontend.BackForFront.Web.Security;
+using ProxyKit;
 
 [assembly: ApiController]
 
@@ -38,15 +36,7 @@ namespace CodingMilitia.PlayBall.WebFrontend.BackForFront.Web
         public void ConfigureServices(IServiceCollection services)
         {
             services
-                .AddMvc(options =>
-                {
-                    var policy = new AuthorizationPolicyBuilder()
-                        .RequireAuthenticatedUser()
-                        .Build();
-                    options.Filters.Add(new AuthorizeFilter(policy));
-                    options.Filters.Add(new AutoValidateAntiforgeryTokenAttribute());
-
-                })
+                .AddMvc()
                 .SetCompatibilityVersion(CompatibilityVersion.Version_2_2)
                 .AddControllersAsServices();
 
@@ -71,16 +61,6 @@ namespace CodingMilitia.PlayBall.WebFrontend.BackForFront.Web
                 .AddHttpContextAccessor();
 
             services
-                .AddHttpClient<GroupsController>((serviceProvider, client) =>
-                {
-                    var configuration = serviceProvider.GetRequiredService<IConfiguration>();
-                    client.BaseAddress = configuration.GetSection<ApiSettings>("GroupManagementApiSettings").Uri;
-                })
-                .AddHttpMessageHandler<AccessTokenHttpMessageHandler>()
-                .AddTransientHttpErrorPolicy(builder =>
-                    builder.WaitAndRetryAsync(5, attempt => TimeSpan.FromSeconds(attempt)));
-
-            services
                 .AddHttpClient<ITokenRefresher, TokenRefresher>();
 
 
@@ -91,10 +71,7 @@ namespace CodingMilitia.PlayBall.WebFrontend.BackForFront.Web
                     options.DefaultScheme = "Cookies";
                     options.DefaultChallengeScheme = "oidc";
                 })
-                .AddCookie("Cookies", options =>
-                {
-                    options.EventsType = typeof(CustomCookieAuthenticationEvents);
-                })
+                .AddCookie("Cookies", options => { options.EventsType = typeof(CustomCookieAuthenticationEvents); })
                 .AddOpenIdConnect("oidc", options =>
                 {
                     var authServiceConfig = _configuration.GetSection<AuthServiceSettings>("AuthServiceSettings");
@@ -114,11 +91,11 @@ namespace CodingMilitia.PlayBall.WebFrontend.BackForFront.Web
                     options.Scope.Add("GroupManagement");
                     options.Scope.Add(OidcConstants.StandardScopes.OfflineAccess);
 
-                    options.CallbackPath = "/api/signin-oidc";
+                    options.CallbackPath = "/auth/signin-oidc";
 
                     options.Events.OnRedirectToIdentityProvider = context =>
                     {
-                        if (!context.HttpContext.Request.Path.StartsWithSegments("/api/auth/login"))
+                        if (!context.HttpContext.Request.Path.StartsWithSegments("/auth/login"))
                         {
                             context.HttpContext.Response.StatusCode = 401;
                             context.HandleResponse();
@@ -131,14 +108,25 @@ namespace CodingMilitia.PlayBall.WebFrontend.BackForFront.Web
             services
                 .AddAntiforgery(options => options.HeaderName = "X-XSRF-TOKEN");
 
-            var dataProtectionKeysLocation = _configuration.GetSection<DataProtectionSettings>(nameof(DataProtectionSettings)).Location;
+            var dataProtectionKeysLocation =
+                _configuration.GetSection<DataProtectionSettings>(nameof(DataProtectionSettings))?.Location;
             if (!string.IsNullOrWhiteSpace(dataProtectionKeysLocation))
             {
                 services
                     .AddDataProtection()
                     .PersistKeysToFileSystem(new DirectoryInfo(dataProtectionKeysLocation));
-                    // TODO: encrypt the keys
+                // TODO: encrypt the keys
             }
+
+            services.AddProxy();
+            
+            services.AddSingleton(
+                new ProxiedApiRouteEndpointLookup(
+                    _configuration.GetSection<Dictionary<string, string>>("ApiRoutes")));
+
+            services
+                .AddSingleton<EnforceAuthenticatedUserMiddleware>()
+                .AddSingleton<ValidateAntiForgeryTokenMiddleware>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -150,7 +138,31 @@ namespace CodingMilitia.PlayBall.WebFrontend.BackForFront.Web
             }
 
             app.UseAuthentication();
+            app.UseMiddleware<EnforceAuthenticatedUserMiddleware>();
+            app.UseMiddleware<ValidateAntiForgeryTokenMiddleware>();
+
             app.UseMvc();
+            
+            app.Map("/api", api =>
+            {
+                api.RunProxy(async context =>
+                {
+                    var endpointLookup = context.RequestServices.GetRequiredService<ProxiedApiRouteEndpointLookup>();
+                    if (endpointLookup.TryGet(context.Request.Path, out var endpoint))
+                    {
+                        var forwardContext = context
+                            .ForwardTo(endpoint)
+                            .CopyXForwardedHeaders();
+
+                        var token = await context.GetAccessTokenAsync();
+                        forwardContext.UpstreamRequest.SetBearerToken(token);
+
+                        return await forwardContext.Send();
+                    }
+
+                    return new HttpResponseMessage(HttpStatusCode.NotFound);
+                });
+            });
         }
     }
 }
