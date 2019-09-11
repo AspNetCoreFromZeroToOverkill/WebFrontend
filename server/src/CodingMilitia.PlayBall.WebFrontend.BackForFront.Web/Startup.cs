@@ -1,4 +1,4 @@
-﻿using System.Collections.Generic;
+using System.Collections.Generic;
 using CodingMilitia.PlayBall.WebFrontend.BackForFront.Web.AuthTokenHelpers;
 using CodingMilitia.PlayBall.WebFrontend.BackForFront.Web.Configuration;
 using IdentityModel;
