@@ -39,7 +39,7 @@ export default class App extends Vue {
   }
 
   public get loginUrl(): string {
-    return `/api/auth/login?returnUrl=${window.location.href}`;
+    return `/auth/login?returnUrl=${window.location.href}`;
   }
 }
 </script>

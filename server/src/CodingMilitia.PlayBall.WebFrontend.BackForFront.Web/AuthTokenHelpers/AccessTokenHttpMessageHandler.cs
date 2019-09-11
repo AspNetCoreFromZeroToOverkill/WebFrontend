@@ -2,7 +2,6 @@ using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Threading;
 using System.Threading.Tasks;
-using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Http;
 
 namespace CodingMilitia.PlayBall.WebFrontend.BackForFront.Web.AuthTokenHelpers
@@ -18,7 +17,7 @@ namespace CodingMilitia.PlayBall.WebFrontend.BackForFront.Web.AuthTokenHelpers
         
         protected override async Task<HttpResponseMessage> SendAsync(HttpRequestMessage request, CancellationToken cancellationToken)
         {
-            var accessToken = await _httpContextAccessor.HttpContext.GetTokenAsync("access_token");
+            var accessToken = await _httpContextAccessor.HttpContext.GetAccessTokenAsync();
             request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", accessToken);
             return await base.SendAsync(request, cancellationToken);
         }
