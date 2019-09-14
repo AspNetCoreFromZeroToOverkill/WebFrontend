@@ -15,13 +15,13 @@ namespace CodingMilitia.PlayBall.WebFrontend.BackForFront.Benchmarks.ProxiedApiR
         {
             DoSanityCheck();
 
-            var summary = BenchmarkRunner.Run<PathMatchingBenchmark>(
+            var summary = BenchmarkRunner.Run<ProxiedApiRouteEndpointLookupBenchmark>(
                 ManualConfig.Create(DefaultConfig.Instance)
                     .With(MemoryDiagnoser.Default));
         }
         
         [RankColumn]
-        public class PathMatchingBenchmark
+        public class ProxiedApiRouteEndpointLookupBenchmark
         {
             [Params(10 , 100, 1000)] 
             public int MaxRoutes { get; set; }
