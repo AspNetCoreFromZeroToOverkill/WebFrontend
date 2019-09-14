@@ -7,7 +7,7 @@ using BenchmarkDotNet.Diagnosers;
 using BenchmarkDotNet.Running;
 using Microsoft.AspNetCore.Http;
 
-namespace CodingMilitia.PlayBall.WebFrontend.BackForFront.Benchmarks
+namespace CodingMilitia.PlayBall.WebFrontend.BackForFront.Benchmarks.ProxiedApiRouteEndpointLookup
 {
     public class Program
     {

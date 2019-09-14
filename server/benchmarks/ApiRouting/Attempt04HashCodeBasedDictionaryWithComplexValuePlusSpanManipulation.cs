@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using Microsoft.AspNetCore.Http;
 
-namespace CodingMilitia.PlayBall.WebFrontend.BackForFront.Benchmarks
+namespace CodingMilitia.PlayBall.WebFrontend.BackForFront.Benchmarks.ProxiedApiRouteEndpointLookup
 {
     public class Attempt04HashCodeBasedDictionaryWithComplexValuePlusSpanManipulation : IProxiedApiRouteEndpointLookup
     {

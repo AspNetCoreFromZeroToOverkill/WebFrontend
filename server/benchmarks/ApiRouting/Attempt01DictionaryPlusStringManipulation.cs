@@ -2,7 +2,7 @@ using System;
 using System.Collections.Generic;
 using Microsoft.AspNetCore.Http;
 
-namespace CodingMilitia.PlayBall.WebFrontend.BackForFront.Benchmarks
+namespace CodingMilitia.PlayBall.WebFrontend.BackForFront.Benchmarks.ProxiedApiRouteEndpointLookup
 {
     public class Attempt01DictionaryPlusStringManipulation : IProxiedApiRouteEndpointLookup
     {
