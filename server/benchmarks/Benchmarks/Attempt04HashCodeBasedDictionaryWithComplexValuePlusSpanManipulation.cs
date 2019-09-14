@@ -1,19 +1,18 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Runtime.CompilerServices;
 using Microsoft.AspNetCore.Http;
 
-namespace CodingMilitia.PlayBall.WebFrontend.BackForFront.Web.ApiRouting
+namespace CodingMilitia.PlayBall.WebFrontend.BackForFront.Benchmarks
 {
-    public class ProxiedApiRouteEndpointLookup
+    public class Attempt04HashCodeBasedDictionaryWithComplexValuePlusSpanManipulation : IProxiedApiRouteEndpointLookup
     {
         // The int dictionary + complex value strategy can be simplified if we're able to lookup directly with a ReadOnlySpan<char>
         // Work in progress here -> https://github.com/dotnet/corefx/issues/31942
-
+        
         private readonly Dictionary<int, Holder[]> _routeMatcher;
 
-        public ProxiedApiRouteEndpointLookup(Dictionary<string, string> routeToEndpointMap)
+        public Attempt04HashCodeBasedDictionaryWithComplexValuePlusSpanManipulation(Dictionary<string, string> routeToEndpointMap)
         {
             var tempRouteMatcher = new Dictionary<int, List<Holder>>();
             foreach (var entry in routeToEndpointMap)
@@ -39,9 +38,7 @@ namespace CodingMilitia.PlayBall.WebFrontend.BackForFront.Web.ApiRouting
             var basePathEnd = pathSpan.Slice(1, pathSpan.Length - 1).IndexOf('/');
             var basePath = pathSpan.Slice(1, basePathEnd > 0 ? basePathEnd : pathSpan.Length - 1);
 
-            // when we upgrade to .NET Core 3.0, we can use string.GetHashCode(basePath)
-            // to get the hashcode directly from the span, which will be much better for allocations
-            if (_routeMatcher.TryGetValue(basePath.ToString().GetHashCode(), out var routes))
+            if (_routeMatcher.TryGetValue(string.GetHashCode(basePath), out var routes))
             {
                 endpoint = FindRoute(basePath, routes);
                 return endpoint != null;
@@ -50,29 +47,27 @@ namespace CodingMilitia.PlayBall.WebFrontend.BackForFront.Web.ApiRouting
             return false;
         }
 
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         private static string FindRoute(ReadOnlySpan<char> route, Holder[] routes)
         {
-            foreach (var currentRoute in routes)
+            foreach(var currentRoute in routes)
             {
-                if (route.Equals(currentRoute.Route, StringComparison.InvariantCultureIgnoreCase))
+                if (route.Equals(currentRoute.route, StringComparison.InvariantCultureIgnoreCase))
                 {
-                    return currentRoute.Endpoint;
+                    return currentRoute.endpoint;
                 }
             }
-
             return null;
         }
 
         private class Holder
         {
-            public readonly string Route;
-            public readonly string Endpoint;
+            public readonly string route;
+            public readonly string endpoint;
 
             public Holder(string route, string endpoint)
             {
-                Route = route;
-                Endpoint = endpoint;
+                this.route = route;
+                this.endpoint = endpoint;
             }
         }
     }
