@@ -2,8 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using BenchmarkDotNet.Attributes;
-using BenchmarkDotNet.Configs;
-using BenchmarkDotNet.Diagnosers;
+using BenchmarkDotNet.Diagnostics.Windows.Configs;
 using BenchmarkDotNet.Running;
 using Microsoft.AspNetCore.Http;
 
@@ -15,19 +14,17 @@ namespace CodingMilitia.PlayBall.WebFrontend.BackForFront.Benchmarks.ProxiedApiR
         {
             DoSanityCheck();
 
-            var summary = BenchmarkRunner.Run<ProxiedApiRouteEndpointLookupBenchmark>(
-                ManualConfig.Create(DefaultConfig.Instance)
-                    .With(MemoryDiagnoser.Default));
+            var summary = BenchmarkRunner.Run<ProxiedApiRouteEndpointLookupBenchmark>();
         }
-        
+
         [RankColumn]
+        [MemoryDiagnoser]
+        //[InliningDiagnoser(logFailuresOnly: false)] //uncomment to see inlining results
         public class ProxiedApiRouteEndpointLookupBenchmark
         {
-            [Params(10 , 100, 1000)] 
-            public int MaxRoutes { get; set; }
+            [Params(10, 100, 1000)] public int MaxRoutes { get; set; }
 
-            private string _path;
-            private PathString _pathString;
+            private PathString _path;
             private static Attempt01DictionaryPlusStringManipulation _attempt01;
             private static Attempt02ArrayIterationPlusPathBeginsWith _attempt02;
             private static Attempt03HashCodeBasedDoubleDictionaryPlusSpanManipulation _attempt03;
@@ -39,48 +36,47 @@ namespace CodingMilitia.PlayBall.WebFrontend.BackForFront.Benchmarks.ProxiedApiR
             {
                 var routeMap = CreateRouteMap(MaxRoutes);
                 _path = $"/route{MaxRoutes - 1}/some/more/things/in/the/path";
-                _pathString = _path;
-                
+
                 _attempt01 = new Attempt01DictionaryPlusStringManipulation(routeMap);
                 _attempt02 = new Attempt02ArrayIterationPlusPathBeginsWith(routeMap);
                 _attempt03 = new Attempt03HashCodeBasedDoubleDictionaryPlusSpanManipulation(routeMap);
                 _attempt04 = new Attempt04HashCodeBasedDictionaryWithComplexValuePlusSpanManipulation(routeMap);
                 _attempt05 = new Attempt0504WithAggressiveInlining(routeMap);
             }
-            
+
 
             [Benchmark(Baseline = true)]
             public string Attempt01DictionaryPlusStringManipulation()
             {
-                _attempt01.TryGet(_pathString, out var result);
+                _attempt01.TryGet(_path, out var result);
                 return result;
             }
 
             [Benchmark]
             public string Attempt02ArrayIterationPlusPathBeginsWith()
             {
-                _attempt02.TryGet(_pathString, out var result);
+                _attempt02.TryGet(_path, out var result);
                 return result;
             }
 
             [Benchmark]
             public string Attempt03HashCodeBasedDoubleDictionaryPlusSpanManipulation()
             {
-                _attempt03.TryGet(_pathString, out var result);
+                _attempt03.TryGet(_path, out var result);
                 return result;
             }
 
             [Benchmark]
             public string Attempt04HashCodeBasedDictionaryWithComplexValuePlusSpanManipulation()
             {
-                _attempt04.TryGet(_pathString, out var result);
+                _attempt04.TryGet(_path, out var result);
                 return result;
             }
-            
+
             [Benchmark]
             public string Attempt0504WithAggressiveInlining()
             {
-                _attempt05.TryGet(_pathString, out var result);
+                _attempt05.TryGet(_path, out var result);
                 return result;
             }
         }
