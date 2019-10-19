@@ -13,6 +13,9 @@ namespace CodingMilitia.PlayBall.WebFrontend.BackForFront.Web.ApiRouting
         public ProxiedApiRouteEndpointLookup(Dictionary<string, string> routeToEndpointMap)
         {
             _routeToEndpointMap = routeToEndpointMap ?? throw new ArgumentNullException(nameof(routeToEndpointMap));
+            
+            // TODO: we should enforce that the routes are actually base routes, having a single segment,
+            // otherwise, given the implemented logic, such cases will never be matched. 
         }
 
         public bool TryGet(PathString path, out string endpoint)
