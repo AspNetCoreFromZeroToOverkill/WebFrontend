@@ -12,7 +12,7 @@ namespace CodingMilitia.PlayBall.WebFrontend.BackForFront.Web.ApiRouting
 
         public ProxiedApiRouteEndpointLookup(Dictionary<string, string> routeToEndpointMap)
         {
-            _routeToEndpointMap = routeToEndpointMap;
+            _routeToEndpointMap = routeToEndpointMap ?? throw new ArgumentNullException(nameof(routeToEndpointMap));
         }
 
         public bool TryGet(PathString path, out string endpoint)
