@@ -26,11 +26,14 @@ namespace CodingMilitia.PlayBall.WebFrontend.BackForFront.Web.Test.ApiRouting
         [Theory]
         [InlineData("/non-existent-route")]
         [InlineData("/test-route-almost")]
+        [InlineData("")]
+        [InlineData(null)]
         public void WhenLookingUpANonExistentRouteThenNothingIsFound(string nonExistentRoute)
         {
             var lookup = new ProxiedApiRouteEndpointLookup(new Dictionary<string, string>
             {
-                ["test-route"] = "test-endpoint"
+                ["test-route"] = "test-endpoint",
+                ["another-test-route"]= "another-test-endpoint"
             });
 
             var found = lookup.TryGet(nonExistentRoute, out _);

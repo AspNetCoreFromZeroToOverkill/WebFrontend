@@ -19,6 +19,12 @@ namespace CodingMilitia.PlayBall.WebFrontend.BackForFront.Web.ApiRouting
         {
             // If/when we get to index a string keyed dictionary with a span, improve this code to avoid allocations
             // Discussion here -> https://github.com/dotnet/corefx/issues/31942
+
+            if (string.IsNullOrWhiteSpace(path.Value))
+            {
+                endpoint = null;
+                return false;
+            }
             
             var pathString = path.Value;
             var basePathEnd = pathString.Substring(1, pathString.Length - 1).IndexOf('/');
