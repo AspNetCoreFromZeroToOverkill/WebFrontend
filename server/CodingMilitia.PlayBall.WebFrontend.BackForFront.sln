@@ -7,6 +7,10 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{735D533C-51F
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CodingMilitia.PlayBall.WebFrontend.BackForFront.Web", "src\CodingMilitia.PlayBall.WebFrontend.BackForFront.Web\CodingMilitia.PlayBall.WebFrontend.BackForFront.Web.csproj", "{A2000AE7-144F-4E18-A0E3-D404844C7435}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "tests", "tests", "{3FF747BE-4FDB-43E9-96F9-289FD512019A}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CodingMilitia.PlayBall.WebFrontend.BackForFront.Web.Test", "tests\CodingMilitia.PlayBall.WebFrontend.BackForFront.Web.Test\CodingMilitia.PlayBall.WebFrontend.BackForFront.Web.Test.csproj", "{C04F94F1-EBE8-43E4-9729-AB15D535837B}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -32,8 +36,21 @@ Global
 		{A2000AE7-144F-4E18-A0E3-D404844C7435}.Release|x64.Build.0 = Release|Any CPU
 		{A2000AE7-144F-4E18-A0E3-D404844C7435}.Release|x86.ActiveCfg = Release|Any CPU
 		{A2000AE7-144F-4E18-A0E3-D404844C7435}.Release|x86.Build.0 = Release|Any CPU
+		{C04F94F1-EBE8-43E4-9729-AB15D535837B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{C04F94F1-EBE8-43E4-9729-AB15D535837B}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{C04F94F1-EBE8-43E4-9729-AB15D535837B}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{C04F94F1-EBE8-43E4-9729-AB15D535837B}.Debug|x64.Build.0 = Debug|Any CPU
+		{C04F94F1-EBE8-43E4-9729-AB15D535837B}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{C04F94F1-EBE8-43E4-9729-AB15D535837B}.Debug|x86.Build.0 = Debug|Any CPU
+		{C04F94F1-EBE8-43E4-9729-AB15D535837B}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{C04F94F1-EBE8-43E4-9729-AB15D535837B}.Release|Any CPU.Build.0 = Release|Any CPU
+		{C04F94F1-EBE8-43E4-9729-AB15D535837B}.Release|x64.ActiveCfg = Release|Any CPU
+		{C04F94F1-EBE8-43E4-9729-AB15D535837B}.Release|x64.Build.0 = Release|Any CPU
+		{C04F94F1-EBE8-43E4-9729-AB15D535837B}.Release|x86.ActiveCfg = Release|Any CPU
+		{C04F94F1-EBE8-43E4-9729-AB15D535837B}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(NestedProjects) = preSolution
 		{A2000AE7-144F-4E18-A0E3-D404844C7435} = {735D533C-51F5-43E4-A000-C96D21B45069}
+		{C04F94F1-EBE8-43E4-9729-AB15D535837B} = {3FF747BE-4FDB-43E9-96F9-289FD512019A}
 	EndGlobalSection
 EndGlobal
