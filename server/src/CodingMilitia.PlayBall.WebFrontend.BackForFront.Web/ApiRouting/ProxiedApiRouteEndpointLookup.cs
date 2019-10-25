@@ -1,7 +1,6 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Runtime.CompilerServices;
 using Microsoft.AspNetCore.Http;
 
 namespace CodingMilitia.PlayBall.WebFrontend.BackForFront.Web.ApiRouting
