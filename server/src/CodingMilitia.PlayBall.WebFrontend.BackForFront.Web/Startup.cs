@@ -16,6 +16,7 @@ using System.IO;
 using System.Net;
 using CodingMilitia.PlayBall.WebFrontend.BackForFront.Web.ApiRouting;
 using CodingMilitia.PlayBall.WebFrontend.BackForFront.Web.Security;
+using Microsoft.Extensions.Hosting;
 using ProxyKit;
 
 [assembly: ApiController]
@@ -36,8 +37,7 @@ namespace CodingMilitia.PlayBall.WebFrontend.BackForFront.Web
         public void ConfigureServices(IServiceCollection services)
         {
             services
-                .AddMvc()
-                .SetCompatibilityVersion(CompatibilityVersion.Version_2_2)
+                .AddControllers()
                 .AddControllersAsServices();
 
 
@@ -55,14 +55,12 @@ namespace CodingMilitia.PlayBall.WebFrontend.BackForFront.Web
             });
 
             services
+                .AddHttpClient<ITokenRefresher, TokenRefresher>();
+            
+            services
                 .AddTransient<CustomCookieAuthenticationEvents>()
-                .AddTransient<ITokenRefresher, TokenRefresher>()
                 .AddTransient<AccessTokenHttpMessageHandler>()
                 .AddHttpContextAccessor();
-
-            services
-                .AddHttpClient<ITokenRefresher, TokenRefresher>();
-
 
             JwtSecurityTokenHandler.DefaultInboundClaimTypeMap.Clear();
 
@@ -130,18 +128,22 @@ namespace CodingMilitia.PlayBall.WebFrontend.BackForFront.Web
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
-        public void Configure(IApplicationBuilder app, IHostingEnvironment env)
+        public void Configure(IApplicationBuilder app, IHostEnvironment env)
         {
             if (env.IsDevelopment())
             {
                 app.UseDeveloperExceptionPage();
             }
 
+            app.UseRouting();
             app.UseAuthentication();
             app.UseMiddleware<EnforceAuthenticatedUserMiddleware>();
             app.UseMiddleware<ValidateAntiForgeryTokenMiddleware>();
-
-            app.UseMvc();
+            
+            app.UseEndpoints(endpoints =>
+            {
+                endpoints.MapControllers();
+            });
             
             app.Map("/api", api =>
             {
