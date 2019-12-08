@@ -1,5 +1,6 @@
 <template>
   <div id="app">
+    <Loader />
     <template v-if="isAuthInfoLoaded">
       <div id="nav">
         <router-link to="/">Home</router-link>
@@ -13,22 +14,25 @@
       </div>
       <router-view/>
     </template>
-    <template v-else>
-      Loading...
-    </template>
   </div>
+  
 </template>
 
 <script lang="ts">
 import { Component, Prop, Vue } from 'vue-property-decorator';
 import { State, namespace } from 'vuex-class';
-import { AuthInfoViewModel } from './models/auth-info-view-model';
+import { AuthState } from './store/modules/auth/state';
+import Loader from '@/components/shared/Loader.vue';
 
 const authModule = namespace('auth');
 
-@Component
+@Component({
+  components: {
+    Loader
+  }
+})
 export default class App extends Vue {
-  @authModule.Getter('info') private authInfo!: AuthInfoViewModel;
+  @authModule.Getter('info') private authInfo!: AuthState;
 
   public get isUserLoggedIn(): boolean {
     return !!this.authInfo ? this.authInfo.loggedIn : false;
@@ -45,20 +49,29 @@ export default class App extends Vue {
 </script>
 
 <style lang="scss">
+$progress-border-radius: 0;
+$progress-bar-background-color: rgba(0,0,0,0.05);
+
+@import 'bulma';
+html {
+  background-color: #f2f2f2;
+}
+
 #app {
   font-family: 'Avenir', Helvetica, Arial, sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   text-align: center;
-  color: #2c3e50;
+  color: $black;
+  
 }
 #nav {
   padding: 30px;
   a {
     font-weight: bold;
-    color: #2c3e50;
+    color: $black;
     &.router-link-exact-active {
-      color: #42b983;
+      color: $primary;
     }
   }
 }

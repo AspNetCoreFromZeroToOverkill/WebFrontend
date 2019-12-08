@@ -10,6 +10,7 @@ export const groups: Module<GroupsState, RootState> = {
     actions: makeActions(new GroupsService()), // TODO: maybe not the best place to create it
     mutations,
     state: {
-        groups: []
+        groups: [],
+        groupDetails: null
     }
 };
