@@ -6,11 +6,11 @@ export const mutations: MutationTree<AuthState> = {
     setUser(state: AuthState, authInfo: AuthInfoModel): void {
         state.loggedIn = true;
         state.loaded = true;
-        state.username = authInfo.name;
+        state.info = authInfo;
     },
     setAnonymousUser(state: AuthState): void {
         state.loggedIn = false;
         state.loaded = true;
-        state.username = null;
+        state.info = null;
     }
 };

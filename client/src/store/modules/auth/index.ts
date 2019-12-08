@@ -14,6 +14,6 @@ export const auth: Module<AuthState, RootState> = {
     state: {
         loggedIn: false,
         loaded: false,
-        username: null
+        info: null
     }
 };

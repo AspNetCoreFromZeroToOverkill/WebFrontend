@@ -1,12 +1,13 @@
 <template>
-  <GroupList v-bind:groups="groups" v-on:update="onUpdate" v-on:remove="onRemove" v-on:add="onAdd"/>
+  <GroupList v-bind:groups="groups" v-on:add="onAdd"/>
 </template>
 <script lang="ts">
 import { Component, Vue } from 'vue-property-decorator';
 import GroupList from '@/components/groups/GroupList.vue';
-import { GroupViewModel } from '@/components/groups/models';
 import { types } from '@/store/modules/groups/actions';
 import { State, namespace } from 'vuex-class';
+import { GroupSummaryModel } from '@/data/groups/models/group-summary.model';
+import { withLoader } from '../shared/loader.functions';
 
 const groupsModule = namespace('groups');
 
@@ -16,24 +17,14 @@ const groupsModule = namespace('groups');
   }
 })
 export default class Groups extends Vue {
-  @groupsModule.State('groups') private groups!: GroupViewModel[];
-  @groupsModule.Action('loadGroups') private loadGroups!: () => void;
+  @groupsModule.State('groups') private groups!: GroupSummaryModel[];
 
-  public mounted(): void {
-    // this.$store.dispatch(types.LOAD_GROUPS); // another way of doing the same
-    this.loadGroups();
+  public async mounted(): Promise<void> {
+    await withLoader(async () =>  await this.$store.dispatch(types.LOAD_GROUPS));
   }
 
-  private onUpdate(group: GroupViewModel): void {
-    this.$store.dispatch(types.UPDATE_GROUP, group);
-  }
-
-  private onRemove(groupId: number): void {
-    this.$store.dispatch(types.REMOVE_GROUP, groupId);
-  }
-
-  private onAdd(group: GroupViewModel): void {
-    this.$store.dispatch(types.ADD_GROUP, group);
+  private async onAdd(group: GroupSummaryModel): Promise<void> {
+    await withLoader(async () => await this.$store.dispatch(types.ADD_GROUP, group));
   }
 }
 </script>
