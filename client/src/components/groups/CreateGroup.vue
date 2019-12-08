@@ -1,23 +1,31 @@
 <template>
-  <span v-if="creating">
-    <input v-model="group.name" placeholder="Enter a name for the group">
-    <button v-on:click="save()">Save</button>
-    <button v-on:click="discard()">Discard</button>
-  </span>
-  <button v-else v-on:click="create()">Create new group</button>
+  <div class="tile is-child"> 
+    <div v-if="creating">
+      <div class="field">
+        <div class="control"><input type="text" class="input is-primary" v-model="group.name" placeholder="Enter a name for the group"></div>
+      </div>
+      <div class="field is-grouped">
+        <div class="control"><button class="button is-primary" v-on:click="save()">Save</button></div>
+        <div class="control"><button class="button is-warning" v-on:click="discard()">Discard</button></div>
+      </div>
+    </div>
+    <div v-else class="control">
+      <button class="button" v-on:click="create()">Create new group</button>
+    </div>
+  </div>
 </template>
 
 <script lang="ts">
 import { Component, Vue, Prop } from 'vue-property-decorator';
-import { GroupViewModel } from './models';
+import { GroupSummaryModel } from '@/data/groups/models';
 
 @Component({})
 export default class CreateGroup extends Vue {
-  private group: GroupViewModel | null = null;
+  private group: GroupSummaryModel | null = null;
   private creating: boolean = false;
 
   private create(): void {
-    this.group = { id: 0, name: '', rowVersion: '' };
+    this.group = { id: 0, name: '' };
     this.creating = true;
   }
   private save(): void {

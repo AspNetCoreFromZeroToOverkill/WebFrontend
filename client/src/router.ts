@@ -2,8 +2,10 @@ import Vue from 'vue';
 import Router from 'vue-router';
 import Home from './views/Home.vue';
 import store from './store';
-import * as authActions from './store/modules/auth/actions';
-import * as authGetters from './store/modules/auth/getters';
+import * as authActions from '@/store/modules/auth/actions';
+import * as groupActions from '@/store/modules/groups/actions';
+import * as authGetters from '@/store/modules/auth/getters';
+import { withLoader } from '@/shared/loader.functions';
 
 Vue.use(Router);
 
@@ -20,7 +22,18 @@ const router = new Router({
       path: '/groups',
       name: 'groups',
       component: () => import('./views/Groups.vue'),
-      meta: { requiresAuthentication: true }
+      meta: { requiresAuthentication: true },
+    },
+    {
+      path: '/groups/:id',
+      name: 'group-details',
+      component: () => import('./views/GroupDetails.vue'),
+      props: true,
+      meta: { requiresAuthentication: true },
+      beforeEnter: async (to, from, next) => {
+        await withLoader(async () => await store.dispatch(groupActions.types.LOAD_GROUP, to.params.id));
+        next();
+      }
     },
     {
       path: '/about',
@@ -35,7 +48,7 @@ const router = new Router({
 
 router.beforeEach(async (to, from, next) => {
   if (!store.getters[authGetters.types.INFO].loaded) {
-    await store.dispatch(authActions.types.LOAD_INFO);
+    await withLoader(async () => await store.dispatch(authActions.types.LOAD_INFO));
   }
   if (to.matched.some(record => record.meta.requiresAuthentication)
     && !store.getters[authGetters.types.INFO].loggedIn) {
