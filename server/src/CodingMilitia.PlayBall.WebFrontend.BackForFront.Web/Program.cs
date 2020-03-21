@@ -8,6 +8,7 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
+using Microsoft.IdentityModel.Logging;
 
 namespace CodingMilitia.PlayBall.WebFrontend.BackForFront.Web
 {
@@ -15,6 +16,7 @@ namespace CodingMilitia.PlayBall.WebFrontend.BackForFront.Web
     {
         public static void Main(string[] args)
         {
+            IdentityModelEventSource.ShowPII = true;
             CreateWebHostBuilder(args).Build().Run();
         }
 

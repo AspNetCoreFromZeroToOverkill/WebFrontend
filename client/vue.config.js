@@ -1,16 +1,22 @@
+var fs = require('fs');
+
 module.exports = {
     devServer: {
       proxy: {
         '^/api': {
-          target: 'http://localhost:5000',
+          target: 'https://localhost:5001',
           ws: true,
           changeOrigin: true
         },
         '^/auth': {
-          target: 'http://localhost:5000',
+          target: 'https://localhost:5001',
           ws: true,
           changeOrigin: true
         },
+      },
+      https: {
+        key: fs.readFileSync('../../Tools/certificates/dev/localhost.key'),
+        cert: fs.readFileSync('../../Tools/certificates/dev/localhost.crt')
       }
     }
   }
